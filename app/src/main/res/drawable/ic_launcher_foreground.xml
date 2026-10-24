@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Кот Баюн: голова кота над открытой книгой; звуковые дуги — чтение вслух -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- уши и голова -->
+    <path android:fillColor="#F2B35E"
+        android:pathData="M38,30 L44,44 L64,44 L70,30 L72,52 C72,62 64,68 54,68 C44,68 36,62 36,52 Z" />
+    <!-- глаза-полумесяцы (кот прищурился — слушает) -->
+    <path android:strokeColor="#2B2A4C" android:strokeWidth="2.5" android:strokeLineCap="round"
+        android:pathData="M45,54 Q48,51 51,54 M57,54 Q60,51 63,54" />
+    <!-- нос -->
+    <path android:fillColor="#2B2A4C" android:pathData="M52.5,58 L55.5,58 L54,60 Z" />
+    <!-- раскрытая книга -->
+    <path android:fillColor="#FFF4E0"
+        android:pathData="M30,66 C40,62 48,64 54,69 C60,64 68,62 78,66 L78,80 C68,77 60,78 54,83 C48,78 40,77 30,80 Z" />
+    <path android:strokeColor="#C99A55" android:strokeWidth="1.5" android:pathData="M54,69 L54,83" />
+    <!-- звук -->
+    <path android:strokeColor="#F2B35E" android:strokeWidth="2.5" android:strokeLineCap="round"
+        android:pathData="M80,46 Q85,52 80,58 M85,42 Q93,52 85,62" />
+</vector>
