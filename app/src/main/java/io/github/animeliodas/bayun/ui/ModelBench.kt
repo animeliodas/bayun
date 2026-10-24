@@ -86,7 +86,9 @@ fun ModelBenchSheet(onDismiss: () -> Unit) {
     var model by remember { mutableStateOf(models.firstOrNull()) }
     var pairs by remember { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
     var budget by remember { mutableStateOf(100_000L) }
-    var pair by remember { mutableStateOf(if (s.effectiveReadingLang == "en") "zh-en" else "zh-ru") }
+    // пары — на язык чтения пользователя (их в наборе 13: семь исходных языков на русский и на английский)
+    val lang = s.effectiveReadingLang
+    var pair by remember { mutableStateOf("zh-$lang") }
     var running by remember { mutableStateOf(false) }
     var stage by remember { mutableStateOf("") }
     var result by remember { mutableStateOf<JSONObject?>(null) }
@@ -102,7 +104,10 @@ fun ModelBenchSheet(onDismiss: () -> Unit) {
                 (0 until (arr?.length() ?: 0)).map { arr!!.getJSONObject(it) }
                     .map { it.optString("pair") to it.optLong("tokens_estimate") }
             }
-        }.onSuccess { pairs = it }.onFailure { error = it.message }
+        }.onSuccess { all ->
+            pairs = all.filter { it.first.endsWith("-$lang") }.ifEmpty { all }
+            if (pairs.none { it.first == pair }) pairs.firstOrNull()?.let { pair = it.first }
+        }.onFailure { error = it.message }
     }
     // прогресс замера: события Polytome bench_progress
     LaunchedEffect(Unit) {
