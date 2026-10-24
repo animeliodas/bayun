@@ -53,7 +53,8 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 private const val BENCH_URL = "https://github.com/animeliodas/polytome/tree/main/bench"
-private const val LEADERBOARD_URL = "https://github.com/animeliodas/polytome/blob/main/bench/LEADERBOARD.md"
+// сайт таблицы моделей (GitHub Pages, собирается из bench/results Polytome); #pair= открывает нужную пару
+private const val LEADERBOARD_URL = "https://animeliodas.github.io/polytome/"
 
 /** Пара языков набора для замеров в понятном виде: «китайский → русский». */
 private fun pairLabel(pair: String): String = pair.split("-").let { "${langName(it[0])} → ${langName(it[1])}" }
@@ -193,7 +194,7 @@ fun ModelBenchSheet(onDismiss: () -> Unit) {
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
             result?.let { BenchResult(context, it) }
             HorizontalDivider()
-            TextButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(LEADERBOARD_URL))) }) {
+            TextButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("$LEADERBOARD_URL#pair=$pair"))) }) {
                 Text(stringResource(R.string.bench_leaderboard))
             }
             Spacer(Modifier.height(12.dp))

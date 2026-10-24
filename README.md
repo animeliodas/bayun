@@ -25,7 +25,7 @@ who listen to books as much as they read them:
 - **Pick a model from the provider's live list** — with prices per 1M tokens and context size, search,
   "free only" and "cheapest first"; or type any model id by hand. "Check model" translates a short shared test
   text and scores it with Polytome's code checks (names, gender, numbers, omissions), with time and cost; the result
-  can be shared to the [common model table](https://github.com/animeliodas/polytome/blob/main/bench/LEADERBOARD.md).
+  can be shared to the [common model table](https://animeliodas.github.io/polytome/).
 - **Original and translation side by side** — tap a paragraph to see the original under the translation;
   long-press to start reading aloud from there.
 - **A reader that stays out of the way** — tap the text to hide the panels. Long-press a sentence and slide:
