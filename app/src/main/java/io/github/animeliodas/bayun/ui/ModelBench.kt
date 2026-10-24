@@ -85,6 +85,7 @@ fun ModelBenchSheet(onDismiss: () -> Unit) {
         s.fastModel.trim().takeIf { it.isNotBlank() && it != s.strongModel.trim() })
     var model by remember { mutableStateOf(models.firstOrNull()) }
     var pairs by remember { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
+    var budget by remember { mutableStateOf(100_000L) }
     var pair by remember { mutableStateOf(if (s.effectiveReadingLang == "en") "zh-en" else "zh-ru") }
     var running by remember { mutableStateOf(false) }
     var stage by remember { mutableStateOf("") }
@@ -95,7 +96,9 @@ fun ModelBenchSheet(onDismiss: () -> Unit) {
         runCatching {
             withContext(Dispatchers.IO) {
                 PolytomeEngine.configure(Prefs.polytomeConfig())
-                val arr = PolytomeEngine.callObject("bench_info").optJSONArray("pairs")
+                val info = PolytomeEngine.callObject("bench_info")
+                budget = info.optLong("budget", 100_000L)
+                val arr = info.optJSONArray("pairs")
                 (0 until (arr?.length() ?: 0)).map { arr!!.getJSONObject(it) }
                     .map { it.optString("pair") to it.optLong("tokens_estimate") }
             }
@@ -135,8 +138,13 @@ fun ModelBenchSheet(onDismiss: () -> Unit) {
             }
             running = false
             r.onSuccess { rec ->
-                if (rec.optString("error").isNotBlank() && rec.optString("error") != "cancelled") error = rec.optString("error")
-                else if (rec.optString("error") != "cancelled") result = rec
+                when (val e = rec.optString("error")) {
+                    "" -> result = rec
+                    "cancelled" -> {}
+                    // жжёт токены: прогон остановлен на лимите — так и сказать, с цифрой
+                    "budget" -> error = context.getString(R.string.bench_over_budget, rec.optLong("budget", budget) / 1000)
+                    else -> error = e
+                }
             }.onFailure { error = it.message ?: it.toString() }
         }
     }
@@ -163,7 +171,8 @@ fun ModelBenchSheet(onDismiss: () -> Unit) {
                 }
             }
             pairs.firstOrNull { it.first == pair }?.let { (_, tokens) ->
-                Text(stringResource(R.string.bench_cost, (tokens + 500) / 1000), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.bench_cost, (tokens + 500) / 1000, budget / 1000),
+                    style = MaterialTheme.typography.bodySmall)
             }
             if (running) {
                 Text(stage, style = MaterialTheme.typography.bodyMedium)

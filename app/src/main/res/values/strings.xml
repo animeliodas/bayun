@@ -196,7 +196,7 @@
     <string name="bench_title">Check model</string>
     <string name="bench_button_hint">Translate a short shared test text and see how well and how cheaply the model does it.</string>
     <string name="bench_hint">The model translates a short test text (two chapters) the same way as books. Quality is measured by the code checks of Polytome, not by another model: names, gender of characters, numbers, leftovers of the original, omissions.</string>
-    <string name="bench_cost">This uses about %d thousand tokens of your provider.</string>
+    <string name="bench_cost">Usually about %1$d thousand tokens of your provider. If the model needs more than %2$d thousand, the check stops.</string>
     <string name="bench_start">Start the check</string>
     <string name="bench_again">Check again</string>
     <string name="bench_starting">Starting…</string>
@@ -220,4 +220,5 @@
     <string name="issue_long">too long</string>
     <string name="issue_duplicate">repeats</string>
     <string name="issue_other">other</string>
+    <string name="bench_over_budget">The model did not fit into %d thousand tokens and the check was stopped. Such a model burns too many tokens for translating books.</string>
 </resources>

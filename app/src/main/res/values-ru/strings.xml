@@ -198,7 +198,7 @@
     <string name="bench_title">Проверить модель</string>
     <string name="bench_button_hint">Перевести короткий общий тестовый текст и посмотреть, насколько хорошо и дёшево модель с ним справляется.</string>
     <string name="bench_hint">Модель переведёт короткий тестовый текст (две главы) так же, как книги. Качество меряют проверки Polytome, а не другая модель: имена, род персонажей, числа, остатки оригинала, пропуски.</string>
-    <string name="bench_cost">Это потратит примерно %d тыс. токенов вашего провайдера.</string>
+    <string name="bench_cost">Обычно это примерно %1$d тыс. токенов вашего провайдера. Если модели нужно больше %2$d тыс., проверка остановится.</string>
     <string name="bench_start">Начать проверку</string>
     <string name="bench_again">Проверить ещё раз</string>
     <string name="bench_starting">Запускаю…</string>
@@ -222,4 +222,5 @@
     <string name="issue_long">слишком длинно</string>
     <string name="issue_duplicate">повторы</string>
     <string name="issue_other">другое</string>
+    <string name="bench_over_budget">Модель не уложилась в %d тыс. токенов, проверка остановлена. Для перевода книг такая модель тратит слишком много токенов.</string>
 </resources>
