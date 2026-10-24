@@ -1,7 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.chaquopy)
+}
+
+// Ключ подписи релизов — вне репозитория: ~/.android/bayun-release.properties (storeFile, storePassword,
+// keyAlias, keyPassword). Нет файла — release собирается неподписанным.
+val releaseKey = Properties().apply {
+    val f = File(System.getProperty("user.home"), ".android/bayun-release.properties")
+    if (f.isFile) f.inputStream().use { load(it) }
 }
 
 android {
@@ -20,8 +29,18 @@ android {
         }
     }
 
+    signingConfigs {
+        if (!releaseKey.isEmpty) create("release") {
+            storeFile = file(releaseKey.getProperty("storeFile"))
+            storePassword = releaseKey.getProperty("storePassword")
+            keyAlias = releaseKey.getProperty("keyAlias")
+            keyPassword = releaseKey.getProperty("keyPassword")
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
