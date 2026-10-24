@@ -192,4 +192,32 @@
     <string name="auto_chapters">Translate the first chapters right away</string>
     <string name="auto_chapters_hint">0 — don\'t. For example 3: you can start reading as soon as the book is added.</string>
     <string name="default_mode">Translation mode for new books</string>
+    <!-- проверка модели -->
+    <string name="bench_title">Check model</string>
+    <string name="bench_button_hint">Translate a short shared test text and see how well and how cheaply the model does it.</string>
+    <string name="bench_hint">The model translates a short test text (two chapters) the same way as books. Quality is measured by the code checks of Polytome, not by another model: names, gender of characters, numbers, leftovers of the original, omissions.</string>
+    <string name="bench_cost">This uses about %d thousand tokens of your provider.</string>
+    <string name="bench_start">Start the check</string>
+    <string name="bench_again">Check again</string>
+    <string name="bench_starting">Starting…</string>
+    <string name="bench_stage_translate">Chapter %1$d of %2$d: translating…</string>
+    <string name="bench_stage_repair">Chapter %1$d of %2$d: checking and repairing…</string>
+    <string name="bench_score">score out of 100</string>
+    <string name="bench_quality">Clean paragraphs: %1$.0f%% right away, %2$.0f%% after repair</string>
+    <string name="bench_usage">%1$.0f s · %2$.1fk tokens</string>
+    <string name="bench_book_cost">About $%.2f per million characters of the original (a long novel)</string>
+    <string name="bench_left">Left after repair: %s</string>
+    <string name="bench_clean">No issues left after repair.</string>
+    <string name="bench_share">Share result</string>
+    <string name="bench_how_to_add">How to add to the table</string>
+    <string name="bench_leaderboard">Shared model table</string>
+    <string name="issue_untranslated">leftovers of the original</string>
+    <string name="issue_names">misspelled names</string>
+    <string name="issue_name_missing">lost names</string>
+    <string name="issue_gender">wrong gender</string>
+    <string name="issue_numbers">numbers</string>
+    <string name="issue_short">too short or missing</string>
+    <string name="issue_long">too long</string>
+    <string name="issue_duplicate">repeats</string>
+    <string name="issue_other">other</string>
 </resources>

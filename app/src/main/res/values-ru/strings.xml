@@ -194,4 +194,32 @@
     <string name="auto_chapters">Сразу переводить первые главы</string>
     <string name="auto_chapters_hint">0 — не переводить. Например, 3: начать читать можно сразу после добавления книги.</string>
     <string name="default_mode">Режим перевода новых книг</string>
+    <!-- проверка модели -->
+    <string name="bench_title">Проверить модель</string>
+    <string name="bench_button_hint">Перевести короткий общий тестовый текст и посмотреть, насколько хорошо и дёшево модель с ним справляется.</string>
+    <string name="bench_hint">Модель переведёт короткий тестовый текст (две главы) так же, как книги. Качество меряют проверки Polytome, а не другая модель: имена, род персонажей, числа, остатки оригинала, пропуски.</string>
+    <string name="bench_cost">Это потратит примерно %d тыс. токенов вашего провайдера.</string>
+    <string name="bench_start">Начать проверку</string>
+    <string name="bench_again">Проверить ещё раз</string>
+    <string name="bench_starting">Запускаю…</string>
+    <string name="bench_stage_translate">Глава %1$d из %2$d: перевод…</string>
+    <string name="bench_stage_repair">Глава %1$d из %2$d: проверка и починка…</string>
+    <string name="bench_score">баллов из 100</string>
+    <string name="bench_quality">Абзацев без ошибок: %1$.0f%% сразу, %2$.0f%% после починки</string>
+    <string name="bench_usage">%1$.0f с · %2$.1f тыс. токенов</string>
+    <string name="bench_book_cost">Примерно $%.2f за миллион знаков оригинала (длинный роман)</string>
+    <string name="bench_left">Осталось после починки: %s</string>
+    <string name="bench_clean">После починки замечаний не осталось.</string>
+    <string name="bench_share">Поделиться результатом</string>
+    <string name="bench_how_to_add">Как добавить в таблицу</string>
+    <string name="bench_leaderboard">Общая таблица моделей</string>
+    <string name="issue_untranslated">остатки оригинала</string>
+    <string name="issue_names">ошибки в именах</string>
+    <string name="issue_name_missing">пропавшие имена</string>
+    <string name="issue_gender">ошибки рода</string>
+    <string name="issue_numbers">числа</string>
+    <string name="issue_short">слишком коротко или пропуск</string>
+    <string name="issue_long">слишком длинно</string>
+    <string name="issue_duplicate">повторы</string>
+    <string name="issue_other">другое</string>
 </resources>

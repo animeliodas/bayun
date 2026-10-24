@@ -89,6 +89,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var checking by remember { mutableStateOf(false) }
     var catalog by remember { mutableStateOf<TtsCatalog.Catalog?>(null) }
     var pickModelFor by remember { mutableStateOf<String?>(null) }  // "strong" | "fast"
+    var showBench by remember { mutableStateOf(false) }
     val ra by ReadAloud.state.collectAsState()
     val books by Library.books.collectAsState()
     // языки, на которых Баюн будет читать вслух: язык чтения + языки книг (перевод и оригинал)
@@ -276,6 +277,9 @@ fun SettingsScreen(onBack: () -> Unit) {
                         }
                     }) { Text(stringResource(if (checking) R.string.checking else R.string.check_connection)) }
                     checkResult?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                    OutlinedButton(onClick = { showBench = true }) { Text(stringResource(R.string.bench_title)) }
+                    Text(stringResource(R.string.bench_button_hint), style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                     HorizontalDivider()
                     Section(stringResource(R.string.new_books))
@@ -310,6 +314,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(32.dp))
         }
     }
+    if (showBench) ModelBenchSheet { showBench = false }
     pickModelFor?.let { slot ->
         ModelPickerSheet(s.provider, s.baseUrl, if (slot == "strong") s.strongModel else s.fastModel,
             onPick = { id ->
