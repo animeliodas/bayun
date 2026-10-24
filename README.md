@@ -2,6 +2,8 @@
 
 **English** · [Русский](README.ru.md)
 
+**[Download the APK](https://github.com/animeliodas/bayun/releases/latest)** — Android 8.0+, 64-bit phone.
+
 Bayun (after Kot Bayun, the storytelling cat of Russian fairy tales) is an open-source Android reader for people
 who listen to books as much as they read them:
 
