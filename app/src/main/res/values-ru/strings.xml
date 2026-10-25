@@ -19,6 +19,8 @@
     <string name="translation_starting">Запускаю перевод…</string>
     <string name="translation_not_configured">Выберите провайдера, ключ и модель в Настройках → Перевод.</string>
     <string name="translation_done">Перевод готов</string>
+    <string name="translation_failed_retry">Не перевелись главы: %1$s. Баюн повторит сам, когда вернётся связь.\n%2$s</string>
+    <string name="translation_error_retry">Перевод прервался: %1$s. Баюн повторит сам, когда вернётся связь.</string>
     <string name="channel_translation">Перевод книг</string>
     <string name="read">Читать</string>
     <string name="translate_book">Перевести всю книгу</string>

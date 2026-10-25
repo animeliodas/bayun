@@ -19,6 +19,8 @@
     <string name="translation_starting">Starting translation…</string>
     <string name="translation_not_configured">Choose a provider, key and model in Settings → Translation.</string>
     <string name="translation_done">Translation finished</string>
+    <string name="translation_failed_retry">Chapters not translated: %1$s. Bayun will try again when the connection is back.\n%2$s</string>
+    <string name="translation_error_retry">Translation stopped: %1$s. Bayun will try again when the connection is back.</string>
     <string name="channel_translation">Book translation</string>
     <string name="read">Read</string>
     <string name="translate_book">Translate the whole book</string>

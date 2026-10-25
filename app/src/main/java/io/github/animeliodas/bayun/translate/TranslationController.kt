@@ -5,6 +5,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -68,6 +72,12 @@ object TranslationController {
         app.getSystemService(NotificationManager::class.java).createNotificationChannel(
             NotificationChannel(CHANNEL, app.getString(R.string.channel_translation), NotificationManager.IMPORTANCE_LOW))
         scope.launch { PolytomeEngine.events.collect { onEvent(it) } }
+        // сеть вернулась (или Android снова её разрешил) — повторить сорвавшееся опережение
+        app.getSystemService(ConnectivityManager::class.java).registerDefaultNetworkCallback(
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) { main.post(retryNow) }
+                override fun onBlockedStatusChanged(network: Network, blocked: Boolean) { if (!blocked) main.post(retryNow) }
+            })
     }
 
     fun title(book: String) = titles[book] ?: File(book).name
@@ -106,6 +116,7 @@ object TranslationController {
 
     fun stop(book: String) {
         Prefs.setAutoResume(book, false)  // пользователь остановил сам — не продолжать без него
+        retries.remove(book)
         scope.launch(Dispatchers.IO) { runCatching { PolytomeEngine.call("cancel", JSONObject().put("book", book)) } }
     }
 
@@ -220,11 +231,49 @@ object TranslationController {
         }
     }
 
+    /** Где сейчас читатель: глава чтения вслух, если оно в этой книге, иначе сохранённая позиция. */
+    private fun currentChapter(book: String): Int? =
+        ReadAloud.state.value.takeIf { it.book == book && it.chapter > 0 }?.chapter ?: Prefs.position(book)?.chapter
+
+    // ---------- повтор после сбоя ----------
+    /**
+     * Книги, у которых главы опережения не перевелись (обычно — пропала связь): номер попытки. Повтор — как только
+     * сеть вернётся, и по таймеру: 1, 2, 4, 8, 16 минут; после шести неудач — до следующего действия читателя.
+     */
+    private val retries = HashMap<String, Int>()
+    private val main = Handler(Looper.getMainLooper())
+    private val retryNow = Runnable { retryFailed() }
+    private const val RETRY_MAX = 6
+    private const val RETRY_BASE_MS = 60_000L
+
+    private fun scheduleRetry(book: String) {
+        val n = (retries[book] ?: 0) + 1
+        if (n > RETRY_MAX) {
+            retries.remove(book)
+            return
+        }
+        retries[book] = n
+        main.removeCallbacks(retryNow)
+        main.postDelayed(retryNow, RETRY_BASE_MS shl (n - 1).coerceAtMost(4))
+    }
+
+    private fun retryFailed() {
+        for (book in retries.keys.toList()) {
+            if (Translations.isRunning(book)) continue
+            val chapter = currentChapter(book) ?: continue
+            Log.d("Translation", "повтор опережения: $book с главы $chapter, попытка ${retries[book]}")
+            readAhead(book, chapter, onNothing = { retries.remove(book) })  // всё уже переведено — повторять нечего
+        }
+    }
+
     // ---------- события Polytome ----------
     private fun onEvent(ev: JSONObject) {
         val book = ev.optString("book")
+        // шаги движка — в logcat (adb logcat -s Polytome): по ним видно, где перевод застрял
+        val kind = ev.optString("ev")
+        if (kind != "batch_done") Log.d("Polytome", "$kind ${ev.optString("msg").ifBlank { ev.optString("error") }}".trim())
         if (book.isBlank() || !Translations.isRunning(book)) return
-        when (ev.optString("ev")) {
+        when (kind) {
             "prepare_start" -> Translations.update(book) { it.copy(preparing = true) }
             "job_start" -> Translations.update(book) { it.copy(preparing = false, total = ev.optInt("total"), done = 0) }
             "chapter_done" -> {
@@ -237,19 +286,30 @@ object TranslationController {
                 val r = ev.optJSONObject("report") ?: JSONObject()
                 val halted = r.optString("HALTED").takeIf { it.isNotBlank() }
                 val cancelled = r.optString("cancelled").isNotBlank()
-                // остановка пользователем или системой — не «готово»
-                if (cancelled && Translations.progress.value[book]?.pausedBySystem != true && !Prefs.autoResume(book)) {
-                    finish(book, null, notify = false)
-                } else finish(book, halted, notify = !cancelled || halted != null)
+                val failed = r.optJSONArray("failed")?.let { a -> (0 until a.length()).map { a.optInt(it) } }.orEmpty()
+                when {
+                    // остановка пользователем или системой — не «готово»
+                    cancelled && Translations.progress.value[book]?.pausedBySystem != true && !Prefs.autoResume(book) ->
+                        finish(book, null, notify = false)
+                    // главы не перевелись (провайдер не ответил, пропала связь) — не «готово», а ошибка и повтор
+                    halted == null && !cancelled && failed.isNotEmpty() -> finish(book, app.getString(
+                        R.string.translation_failed_retry, failed.joinToString(), r.optString("failed_error").take(200)),
+                        notify = true, retry = true)
+                    // остановлено на ошибках провайдера (сеть, перегрузка) — тоже повторить позже
+                    else -> finish(book, halted?.let { app.getString(R.string.translation_error_retry, it.take(200).trimEnd('.', ' ')) },
+                        notify = !cancelled || halted != null, retry = halted != null)
+                }
             }
-            "job_error" -> finish(book, ev.optString("error"), notify = true)
+            "job_error" -> finish(book, app.getString(R.string.translation_error_retry, ev.optString("error").take(200).trimEnd('.', ' ')),
+                notify = true, retry = true)
         }
     }
 
-    private fun finish(book: String, error: String?, notify: Boolean) {
+    private fun finish(book: String, error: String?, notify: Boolean, retry: Boolean = false) {
         val paused = Translations.progress.value[book]?.pausedBySystem == true
         Translations.update(book) { it.copy(running = false, preparing = false, error = error) }
         if (error == null && !paused) Prefs.setAutoResume(book, false)  // доделано
+        if (retry) scheduleRetry(book) else if (error == null) retries.remove(book)
         // чтение вслух ждёт главу, которой не было в этом переводе (режим «открытая глава»/«с опережением»): сразу
         // перевести её, а не переключаться на оригинал
         val ra = ReadAloud.state.value
@@ -267,7 +327,7 @@ object TranslationController {
             })
             // читатель ушёл вперёд, пока шёл перевод (или чтение вслух ждёт главу) — догнать
             if (waitingHere) readAhead(book, ra.chapter, onNothing = { ReadAloud.onTranslationStopped(book) })
-            else if (error == null && !paused) Prefs.position(book)?.let { readAhead(book, it.chapter) }
+            else if (error == null && !paused) currentChapter(book)?.let { readAhead(book, it) }
         }
     }
 
